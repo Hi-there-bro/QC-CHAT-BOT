@@ -22,10 +22,12 @@ def append_to_google_sheet(data):
         "https://www.googleapis.com/auth/drive"
     ]
 
-    creds_dict = json.loads(os.environ["GOOGLE_CREDENTIALS"])
-    creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
+    creds = Credentials.from_service_account_file(
+        "/etc/secrets/google_credentials.json",
+        scopes=scope
+    )
+    
     client = gspread.authorize(creds)
-
     sheet = client.open("QC_Defect_Log").sheet1
 
     sheet.append_row([
@@ -149,6 +151,7 @@ def handle_message(event):
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=10000)
+
 
 
 
