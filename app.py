@@ -115,28 +115,9 @@ def handle_message(event):
             data["Total"] = int(data["Total"])
             data["SN"] = data["SN"].strip().upper()
             data["Datetime"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-            file_path = "defect_log.xlsx"
-
-            if os.path.exists(file_path):
-                 df_existing = pd.read_excel(file_path, engine="openpyxl")
-                 df_new = pd.concat([df_existing, pd.DataFrame([data])], ignore_index=True)
-            else:
-                 df_new = pd.DataFrame([data])
-            # 👇 ใส่ตรงนี้
-            columns_order = [
-                "Type",
-                "Line",
-                "Defect",
-                "Position",
-                "Model",
-                "Total",
-                "SN",
-                "Datetime"
-                ]
-            df_new = df_new[columns_order]
-            df_new.to_excel(file_path, index=False, engine="openpyxl")
-            reply_text = "✅ Report saved successfully."
+            
+            append_to_google_sheet(data)
+            reply_text = "✅ Report saved to Google Sheet successfully."
 
         except Exception as e:
             print("Format Error:", e)
@@ -158,3 +139,4 @@ def handle_message(event):
 if __name__ == "__main__":
 
     app.run(host="0.0.0.0", port=10000)
+
