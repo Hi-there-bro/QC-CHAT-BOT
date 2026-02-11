@@ -41,8 +41,8 @@ def append_to_google_sheet(data):
 
 app = Flask(__name__)
 
-CHANNEL_SECRET = "2b5f5dd4ef2d79726b281a295f59e5ea"
-CHANNEL_ACCESS_TOKEN = "rXJuq8Pju/t5ku+18qWVMs1ovjqRpF0E+807VPZVtZ/p/0ncgBRWfNXSlKIJ+zBaqjYxFvegIr0L7+xTGlwvCDgYFYOBDHwF6erF+vK6qcWrgtZqM3e/E5Rk6mmQ2KceAdlBL9OJEsswytQh68SWhAdB04t89/1O/w1cDnyilFU="
+CHANNEL_SECRET = os.environ["CHANNEL_SECRET"]
+CHANNEL_ACCESS_TOKEN = os.environ["CHANNEL_ACCESS_TOKEN"]
 
 configuration = Configuration(access_token=CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(CHANNEL_SECRET)
@@ -139,4 +139,5 @@ def handle_message(event):
 if __name__ == "__main__":
 
     app.run(host="0.0.0.0", port=10000)
+
 
