@@ -86,39 +86,38 @@ def handle_message(event):
         
     else:
         try:
-            # แปลง newline เป็นช่องว่าง และตัดช่องว่างซ้ำ
-            cleaned_text = re.sub(r"\s+", " ", cleaned_text)
-
-            pattern = r"""
-            (?P<Type>.+?)
-            \s+line:\s*(?P<Line>[^\s]+)
-            \s+defect:\s*(?P<Defect>[^\s]+)
-            \s+position:\s*(?P<Position>[^\s]+)
-            \s+model:\s*(?P<Model>[^\s]+)
-            \s+total:\s*(?P<Total>\d+)
-            \s+sn:\s*(?P<SN>[^\s]+)
-            """
-
-            match = re.search(pattern, cleaned_text, re.IGNORECASE | re.VERBOSE)
-
-            if not match:
-                raise ValueError("Format incorrect")
-
-            data = match.groupdict()
-
-            # Format ข้อมูลให้สวย
-            data["Type"] = data["Type"].strip().title()
-            data["Line"] = data["Line"].strip().upper()
-            data["Defect"] = data["Defect"].strip()
-            data["Position"] = data.get("Position", "-").strip()
-            data["Model"] = data["Model"].strip().upper()
-            data["Total"] = int(data["Total"])
-            data["SN"] = data["SN"].strip().upper()
-            data["Datetime"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            
+            # ไม่ต้องแปลง newline แล้ว
+            lines = cleaned_text.split("\n")
+            data = {
+                "Type": lines[0].strip().title(),
+                "Line": "",
+                "Defect": "",
+                "Position": "",
+                "Model": "",
+                "Total": 0,
+                "SN": "",
+                "Datetime": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            }
+            for line in lines[1:]:
+                if line.lower().startswith("line:"):
+                    data["Line"] = line.split(":",1)[1].strip().upper()
+                elif line.lower().startswith("defect:"):
+                    data["Defect"] = line.split(":",1)[1].strip()
+                elif line.lower().startswith("position:"):
+                    data["Position"] = line.split(":",1)[1].strip()
+                elif line.lower().startswith("model:"):
+                    data["Model"] = line.split(":",1)[1].strip().upper()
+                elif line.lower().startswith("total:"):
+                    data["Total"] = int(line.split(":",1)[1].strip())
+                elif line.lower().startswith("sn:"):
+                    data["SN"] = line.split(":",1)[1].strip().upper()
+            # ตรวจว่าข้อมูลครบไหม
+            if not all([data["Type"], data["Line"], data["Defect"], data["Model"], data["SN"]]):
+                raise ValueError("Missing required field")
             append_to_google_sheet(data)
+        
             reply_text = "✅ Report saved to Google Sheet successfully."
-
+    
         except Exception as e:
             print("Format Error:", e)
             reply_text = (
@@ -139,6 +138,7 @@ def handle_message(event):
 if __name__ == "__main__":
 
     app.run(host="0.0.0.0", port=10000)
+
 
 
 
