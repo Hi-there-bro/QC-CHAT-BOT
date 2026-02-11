@@ -82,12 +82,12 @@ def handle_message(event):
             "Model: \n"
             "Total: \n"
             "SN: "
-            )
+        )
         
     else:
         try:
             # ไม่ต้องแปลง newline แล้ว
-            lines = cleaned_text.split("\n")
+            lines = [l.strip() for l in cleaned_text.split("\n") if l.strip() != ""]
             data = {
                 "Type": lines[0].strip().title(),
                 "Line": "",
@@ -101,28 +101,40 @@ def handle_message(event):
             for line in lines[1:]:
                 if line.lower().startswith("line:"):
                     data["Line"] = line.split(":",1)[1].strip().upper()
+                    
                 elif line.lower().startswith("defect:"):
                     data["Defect"] = line.split(":",1)[1].strip()
+                    
                 elif line.lower().startswith("position:"):
                     data["Position"] = line.split(":",1)[1].strip()
+                    
                 elif line.lower().startswith("model:"):
                     data["Model"] = line.split(":",1)[1].strip().upper()
+                    
                 elif line.lower().startswith("total:"):
                     data["Total"] = int(line.split(":",1)[1].strip())
+                    
                 elif line.lower().startswith("sn:"):
                     data["SN"] = line.split(":",1)[1].strip().upper()
-            # ตรวจว่าข้อมูลครบไหม
-            if not all([data["Type"], data["Line"], data["Defect"], data["Model"], data["SN"]]):
+                    
+            if not all([
+                data["Type"],
+                data["Line"],
+                data["Defect"],
+                data["Model"],
+                data["SN"],
+                data["Total"] > 0
+            ]):
                 raise ValueError("Missing required field")
+                
             append_to_google_sheet(data)
-        
             reply_text = "✅ Report saved to Google Sheet successfully."
     
         except Exception as e:
             print("Format Error:", e)
             reply_text = (
-                "⚠️ Format incorrect.\n\n"
-                "Please Retry:\n\n"
+                "⚠️ Format Incorrect ⚠️\n"
+                "⚠️ Please Retry ⚠️"
             )
 
     # ส่งข้อความตอบกลับ
@@ -136,8 +148,8 @@ def handle_message(event):
         )
 
 if __name__ == "__main__":
-
     app.run(host="0.0.0.0", port=10000)
+
 
 
 
