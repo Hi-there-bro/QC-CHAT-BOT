@@ -76,10 +76,10 @@ def handle_message(event):
             "📋 Please fill in the report using this format:\n\n"
             "#report\n"
             "Cosmetic Fail\n"
-            "LINE: \n"
+            "Line: \n"
             "Defect: \n"
             "Position: \n"
-            "MODEL: \n"
+            "Model: \n"
             "TOTAL: \n"
             "SN: "
             )
@@ -139,5 +139,6 @@ def handle_message(event):
 if __name__ == "__main__":
 
     app.run(host="0.0.0.0", port=10000)
+
 
 
