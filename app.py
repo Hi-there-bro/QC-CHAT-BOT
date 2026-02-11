@@ -1,3 +1,6 @@
+import gspread
+import json
+from google.oauth2.service_account import Credentials
 import pandas as pd
 from datetime import datetime
 import os
@@ -12,6 +15,29 @@ from linebot.v3.messaging import (
     TextMessage
 )
 from linebot.v3.webhooks import MessageEvent, TextMessageContent
+
+def append_to_google_sheet(data):
+    scope = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+    ]
+
+    creds_dict = json.loads(os.environ["GOOGLE_CREDENTIALS"])
+    creds = Credentials.from_service_account_info(creds_dict, scopes=scope)
+    client = gspread.authorize(creds)
+
+    sheet = client.open("QC_Defect_Log").sheet1
+
+    sheet.append_row([
+        data["Type"],
+        data["Line"],
+        data["Defect"],
+        data["Position"],
+        data["Model"],
+        data["Total"],
+        data["SN"],
+        data["Datetime"]
+    ])
 
 app = Flask(__name__)
 
@@ -130,4 +156,5 @@ def handle_message(event):
         )
 
 if __name__ == "__main__":
+
     app.run(host="0.0.0.0", port=10000)
