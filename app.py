@@ -80,7 +80,7 @@ def handle_message(event):
             "Defect: \n"
             "Position: \n"
             "Model: \n"
-            "TOTAL: \n"
+            "Total: \n"
             "SN: "
             )
         
@@ -138,6 +138,7 @@ def handle_message(event):
 if __name__ == "__main__":
 
     app.run(host="0.0.0.0", port=10000)
+
 
 
 
